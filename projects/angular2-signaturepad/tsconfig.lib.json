@@ -7,19 +7,16 @@
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "types": [],
-    "lib": [
-      "dom",
-      "es2018"
-    ]
+    "lib": ["dom", "es2018"]
   },
   "angularCompilerOptions": {
+    "max-line-length": [true, 120],
     "skipTemplateCodegen": true,
     "strictMetadataEmit": true,
     "enableResourceInlining": true
   },
-  "exclude": [
-    "src/test.ts",
-    "**/*.spec.ts"
-  ]
+  "exclude": ["src/test.ts", "**/*.spec.ts"]
 }

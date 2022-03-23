@@ -9,66 +9,58 @@ import {
 } from '@angular/core';
 
 import * as SignaturePadNative from 'signature_pad';
-
-export interface Point {
-  x: number;
-  y: number;
-  time: number;
-}
-
-export type PointGroup = Array<Point>;
-
+import { FromDataOptions, PointGroup } from 'signature_pad';
+import { FromDataUrlOptions } from './interfaces/from-data-url-options';
+import { SignaturePadOptions } from './interfaces/signature-pad-options';
 @Component({
   template: '<canvas></canvas>',
+  // tslint:disable-next-line: component-selector
   selector: 'signature-pad',
 })
 export class SignaturePad implements AfterContentInit, OnDestroy {
-  @Input() public options: any;
-  @Output() public onBeginEvent: EventEmitter<boolean>;
-  @Output() public onEndEvent: EventEmitter<boolean>;
+  @Input() public options: Partial<SignaturePadOptions> = {};
+  @Output() public drawStart = new EventEmitter<boolean>();
+  @Output() public drawEnd = new EventEmitter<boolean>();
 
-  private signaturePad: any;
-  private elementRef: ElementRef;
+  private signaturePad!: SignaturePadNative.default;
 
-  constructor(elementRef: ElementRef) {
-    // no op
-    this.elementRef = elementRef;
-    this.options = this.options || {};
-    this.onBeginEvent = new EventEmitter();
-    this.onEndEvent = new EventEmitter();
-  }
+  constructor(private elementRef: ElementRef) {}
 
   public ngAfterContentInit(): void {
-    const canvas: any = this.elementRef.nativeElement.querySelector('canvas');
+    const canvas: HTMLCanvasElement =
+      this.elementRef.nativeElement.querySelector('canvas');
 
-    if ((this.options as any).canvasHeight) {
-      canvas.height = (this.options as any).canvasHeight;
+    if (this.options.canvasHeight) {
+      canvas.height = this.options.canvasHeight;
     }
 
-    if ((this.options as any).canvasWidth) {
-      canvas.width = (this.options as any).canvasWidth;
+    if (this.options.canvasWidth) {
+      canvas.width = this.options.canvasWidth;
     }
 
     this.signaturePad = new SignaturePadNative.default(canvas, this.options);
-    this.signaturePad.onBegin = this.onBegin.bind(this);
-    this.signaturePad.onEnd = this.onEnd.bind(this);
+    this.signaturePad.addEventListener('beginStroke', this.onBegin.bind(this));
+    this.signaturePad.addEventListener('endStroke', this.onEnd.bind(this));
   }
 
   public ngOnDestroy(): void {
-    const canvas: any = this.elementRef.nativeElement.querySelector('canvas');
+    const canvas: HTMLCanvasElement =
+      this.elementRef.nativeElement.querySelector('canvas');
     canvas.width = 0;
     canvas.height = 0;
   }
 
-  public resizeCanvas(): void {
+  public resizeCanvas(canvas: HTMLCanvasElement): void {
     // When zoomed out to less than 100%, for some very strange reason,
     // some browsers report devicePixelRatio as less than 1
     // and only part of the canvas is cleared then.
+    if (!canvas) {
+      return;
+    }
     const ratio: number = Math.max(window.devicePixelRatio || 1, 1);
-    const canvas: any = this.signaturePad.canvas;
     canvas.width = canvas.offsetWidth * ratio;
     canvas.height = canvas.offsetHeight * ratio;
-    canvas.getContext('2d').scale(ratio, ratio);
+    canvas.getContext('2d')?.scale(ratio, ratio);
     this.signaturePad.clear(); // otherwise isEmpty() might return incorrect value
   }
 
@@ -82,8 +74,8 @@ export class SignaturePad implements AfterContentInit, OnDestroy {
   }
 
   // Draws signature image from an array of point groups
-  public fromData(points: Array<PointGroup>): void {
-    this.signaturePad.fromData(points as any);
+  public fromData(points: Array<PointGroup>, options?: FromDataOptions): void {
+    this.signaturePad.fromData(points, options);
   }
 
   // Returns signature image as data URL (see https://mdn.io/todataurl for the list of possible paramters)
@@ -92,16 +84,13 @@ export class SignaturePad implements AfterContentInit, OnDestroy {
   }
 
   // Draws signature image from data URL
-  public fromDataURL(dataURL: string, options: any = {}): void {
+  public fromDataURL(dataURL: string, options: FromDataUrlOptions = {}): void {
     // set default height and width on read data from URL
-    if (
-      !options.hasOwnProperty('height') &&
-      (this.options as any).canvasHeight
-    ) {
-      options.height = (this.options as any).canvasHeight;
+    if (!options.hasOwnProperty('height') && this.options.canvasHeight) {
+      options.height = this.options.canvasHeight;
     }
-    if (!options.hasOwnProperty('width') && (this.options as any).canvasWidth) {
-      options.width = (this.options as any).canvasWidth;
+    if (!options.hasOwnProperty('width') && this.options.canvasWidth) {
+      options.width = this.options.canvasWidth;
     }
     this.signaturePad.fromDataURL(dataURL, options);
   }
@@ -128,26 +117,28 @@ export class SignaturePad implements AfterContentInit, OnDestroy {
 
   // set an option on the signaturePad - e.g. set('minWidth', 50);
   public set(option: string, value: any): void {
+    const canvas: HTMLCanvasElement =
+      this.elementRef.nativeElement.querySelector('canvas');
     switch (option) {
       case 'canvasHeight':
-        this.signaturePad.canvas.height = value;
+        canvas.height = value;
         break;
       case 'canvasWidth':
-        this.signaturePad.canvas.width = value;
+        canvas.width = value;
         break;
       default:
-        this.signaturePad[option] = value;
+        (this.signaturePad as any)[option] = value;
     }
   }
 
   // notify subscribers on signature begin
   public onBegin(): void {
-    this.onBeginEvent.emit(true);
+    this.drawStart.emit(true);
   }
 
   // notify subscribers on signature end
   public onEnd(): void {
-    this.onEndEvent.emit(true);
+    this.drawEnd.emit(true);
   }
 
   public queryPad(): any {
