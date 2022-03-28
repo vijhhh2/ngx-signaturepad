@@ -66,12 +66,12 @@ export class SignaturePadPage{
     this.signaturePad.clear(); // invoke functions from szimek/signature_pad API
   }
 
-  drawComplete() {
+  drawEnd() {
     // will be notified of szimek/signature_pad's onEnd event
     console.log(this.signaturePad.toDataURL());
   }
 
-  drawEnd() {
+  drawStart() {
     // will be notified of szimek/signature_pad's onBegin event
     console.log('begin drawing');
   }

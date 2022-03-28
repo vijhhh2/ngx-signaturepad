@@ -1,5 +1,18 @@
-<signature-pad
+<!-- <signature-pad
   [options]="signaturePadOptions"
   (drawStart)="drawStart()"
   (drawEnd)="drawComplete()"
-></signature-pad>
+></signature-pad> -->
+<form [formGroup]="form">
+  <signature-pad-control
+    formControlName="signature"
+    [canvasStylesObject]="styles"
+    [exportType]="'dataURL'"
+    [options]="signaturePadOptions"
+    (drawStart)="drawStart()"
+    (drawEnd)="drawComplete()"
+  ></signature-pad-control>
+  <div>
+    <button type="button" (click)="clear()">Clear</button>
+  </div>
+</form>

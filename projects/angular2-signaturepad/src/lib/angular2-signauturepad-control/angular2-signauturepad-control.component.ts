@@ -1,30 +1,118 @@
 import {
   Component,
-  ElementRef,
-  EventEmitter,
+  ChangeDetectionStrategy,
   Input,
   Output,
-  OnDestroy,
+  EventEmitter,
+  ElementRef,
+  ViewEncapsulation,
+  Optional,
+  Host,
+  SkipSelf,
+  OnInit,
   AfterViewInit,
 } from '@angular/core';
-
+import {
+  ControlContainer,
+  ControlValueAccessor,
+  FormControl,
+  FormGroup,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 import * as SignaturePadNative from 'signature_pad';
 import { FromDataOptions, PointGroup } from 'signature_pad';
-import { FromDataUrlOptions } from './interfaces/from-data-url-options';
-import { SignaturePadOptions } from './interfaces/signature-pad-options';
+import { FromDataUrlOptions, InputType, OutputType } from '../interfaces';
+import { SignaturePadOptions } from '../interfaces';
+
 @Component({
-  template: '<canvas></canvas>',
-  // tslint:disable-next-line: component-selector
-  selector: 'signature-pad',
+  selector: 'signature-pad-control',
+  template: '<canvas [ngStyle]="canvasStylesObject"></canvas>',
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: SignauturepadControlComponent,
+      multi: true,
+    },
+  ],
 })
-export class SignaturePad implements AfterViewInit, OnDestroy {
+export class SignauturepadControlComponent
+  implements AfterViewInit, OnInit, ControlValueAccessor
+{
+  @Input() public formControlName = '';
   @Input() public options: Partial<SignaturePadOptions> = {};
+  @Input() public exportType: OutputType = 'dataURL';
+  @Input() public canvasStylesObject: Partial<CSSStyleDeclaration> = {
+    border: 'none',
+  };
+
   @Output() public drawStart = new EventEmitter<boolean>();
   @Output() public drawEnd = new EventEmitter<boolean>();
 
-  protected signaturePad!: SignaturePadNative.default;
+  private signaturePad!: SignaturePadNative.default;
+  disabled = false;
 
-  constructor(private elementRef: ElementRef) {}
+  onTouched!: () => void;
+  onChange!: (value: InputType) => void;
+  control!: FormControl;
+
+  constructor(
+    private elementRef: ElementRef,
+    @Optional()
+    @Host()
+    @SkipSelf()
+    private parentFormContainer: ControlContainer
+  ) {}
+
+  writeValue(obj: InputType): void {
+    setTimeout(() => {
+      if (obj instanceof Array) {
+        this.fromData(obj);
+      }
+
+      if (typeof obj === 'string') {
+        this.fromDataURL(obj);
+      }
+    });
+  }
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
+  }
+
+  setState(): void {
+    if (!this.disabled) {
+      if (this.exportType === 'dataURL') {
+        this.onChange?.(this.toDataURL());
+        this.onTouched?.();
+      } else if (this.exportType === 'data') {
+        this.onChange?.(this.toData());
+        this.onTouched?.();
+      }
+    }
+  }
+
+  ngOnInit(): void {
+    if (this.parentFormContainer) {
+      this.control = (this.parentFormContainer.control as FormGroup).controls[
+        this.formControlName
+      ] as FormControl;
+    }
+  }
 
   public ngAfterViewInit(): void {
     const canvas: HTMLCanvasElement =
@@ -43,12 +131,12 @@ export class SignaturePad implements AfterViewInit, OnDestroy {
     this.signaturePad.addEventListener('endStroke', this.onEnd.bind(this));
   }
 
-  public ngOnDestroy(): void {
-    const canvas: HTMLCanvasElement =
-      this.elementRef.nativeElement.querySelector('canvas');
-    canvas.width = 0;
-    canvas.height = 0;
-  }
+  // public ngOnDestroy(): void {
+  //   const canvas: HTMLCanvasElement =
+  //     this.elementRef.nativeElement.querySelector('canvas');
+  //   canvas.width = 0;
+  //   canvas.height = 0;
+  // }
 
   public resizeCanvas(canvas: HTMLCanvasElement): void {
     // When zoomed out to less than 100%, for some very strange reason,
@@ -98,6 +186,7 @@ export class SignaturePad implements AfterViewInit, OnDestroy {
   // Clears the canvas
   public clear(): void {
     this.signaturePad.clear();
+    this.control.setValue(null);
   }
 
   // Returns true if canvas is empty, otherwise returns false
@@ -139,6 +228,7 @@ export class SignaturePad implements AfterViewInit, OnDestroy {
   // notify subscribers on signature end
   public onEnd(): void {
     this.drawEnd.emit(true);
+    this.setState();
   }
 
   public queryPad(): any {
