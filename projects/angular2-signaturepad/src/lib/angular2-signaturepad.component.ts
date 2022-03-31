@@ -13,12 +13,15 @@ import { FromDataOptions, PointGroup } from 'signature_pad';
 import { FromDataUrlOptions } from './interfaces/from-data-url-options';
 import { SignaturePadOptions } from './interfaces/signature-pad-options';
 @Component({
-  template: '<canvas></canvas>',
+  template: '<canvas [ngClass]="canvasStylesObject" ></canvas>',
   // tslint:disable-next-line: component-selector
   selector: 'signature-pad',
 })
 export class SignaturePad implements AfterViewInit, OnDestroy {
   @Input() public options: Partial<SignaturePadOptions> = {};
+  @Input() public canvasStylesObject: Partial<CSSStyleDeclaration> = {
+    border: 'none',
+  };
   @Output() public drawStart = new EventEmitter<boolean>();
   @Output() public drawEnd = new EventEmitter<boolean>();
 
@@ -48,6 +51,7 @@ export class SignaturePad implements AfterViewInit, OnDestroy {
       this.elementRef.nativeElement.querySelector('canvas');
     canvas.width = 0;
     canvas.height = 0;
+    this.off();
   }
 
   public resizeCanvas(canvas: HTMLCanvasElement): void {

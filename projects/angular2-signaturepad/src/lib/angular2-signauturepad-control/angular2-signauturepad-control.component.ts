@@ -11,6 +11,7 @@ import {
   SkipSelf,
   OnInit,
   AfterViewInit,
+  OnDestroy,
 } from '@angular/core';
 import {
   ControlContainer,
@@ -45,7 +46,7 @@ import { SignaturePadOptions } from '../interfaces';
   ],
 })
 export class SignauturepadControlComponent
-  implements AfterViewInit, OnInit, ControlValueAccessor
+  implements AfterViewInit, OnInit, ControlValueAccessor, OnDestroy
 {
   @Input() public formControlName = '';
   @Input() public options: Partial<SignaturePadOptions> = {};
@@ -131,12 +132,13 @@ export class SignauturepadControlComponent
     this.signaturePad.addEventListener('endStroke', this.onEnd.bind(this));
   }
 
-  // public ngOnDestroy(): void {
-  //   const canvas: HTMLCanvasElement =
-  //     this.elementRef.nativeElement.querySelector('canvas');
-  //   canvas.width = 0;
-  //   canvas.height = 0;
-  // }
+  public ngOnDestroy(): void {
+    const canvas: HTMLCanvasElement =
+      this.elementRef.nativeElement.querySelector('canvas');
+    canvas.width = 0;
+    canvas.height = 0;
+    this.off();
+  }
 
   public resizeCanvas(canvas: HTMLCanvasElement): void {
     // When zoomed out to less than 100%, for some very strange reason,
