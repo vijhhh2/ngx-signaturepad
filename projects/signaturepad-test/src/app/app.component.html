@@ -13,6 +13,9 @@
     (drawEnd)="drawComplete()"
   ></signature-pad-control>
   <div>
-    <button type="button" (click)="clear()">Clear</button>
+    <button type="button" class="mr-2" (click)="clear()">Clear</button>
+    <button type="submit" class="mr-2" (click)="submit()">Submit</button>
+    <button type="button" class="mr-2" (click)="enable()">Enable</button>
+    <button type="button" (click)="disable()">Disable</button>
   </div>
 </form>

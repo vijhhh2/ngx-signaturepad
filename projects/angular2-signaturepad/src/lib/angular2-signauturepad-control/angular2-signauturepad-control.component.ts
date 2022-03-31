@@ -40,12 +40,12 @@ import { SignaturePadOptions } from '../interfaces';
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: SignauturepadControlComponent,
+      useExisting: SignaturePadControl,
       multi: true,
     },
   ],
 })
-export class SignauturepadControlComponent
+export class SignaturePadControl
   implements AfterViewInit, OnInit, ControlValueAccessor, OnDestroy
 {
   @Input() public formControlName = '';
@@ -93,6 +93,13 @@ export class SignauturepadControlComponent
 
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
+    setTimeout(() => {
+      if (this.disabled) {
+        this.disableCanvas();
+      } else {
+        this.enableCanvas();
+      }
+    });
   }
 
   setState(): void {
@@ -235,5 +242,12 @@ export class SignauturepadControlComponent
 
   public queryPad(): any {
     return this.signaturePad;
+  }
+
+  public disableCanvas(): void {
+    this.off();
+  }
+  public enableCanvas(): void {
+    this.on();
   }
 }
