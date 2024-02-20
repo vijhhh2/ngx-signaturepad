@@ -8,7 +8,7 @@ Fork of [wulfsolter/angular2-signaturepad](https://www.npmjs.com/package/angular
   - [x] Added Signature pad control
 # Install 
 
-`npm install angular2-signaturepad --save`
+`npm i @vijhhh2/ngx-signaturepad --save`
 
 ## Reference Implementation
 
@@ -29,7 +29,7 @@ Options are as per [szimek/signature_pad](https://www.npmjs.com/package/signatur
 
 // import into app module
 
-import { SignaturePadModule } from 'angular2-signaturepad';
+import { SignaturePadModule } from '@vijhhh2/angular2-signaturepad';
 
 ...
 
