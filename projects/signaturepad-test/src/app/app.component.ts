@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, FormGroup } from '@angular/forms';
 import {
   SignaturePad,
   SignaturePadOptions,
@@ -202,7 +202,7 @@ export class AppComponent implements AfterViewInit {
     cursor: 'crosshair',
   };
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: UntypedFormBuilder) {}
 
   ngAfterViewInit(): void {
     this.signaturePad.set('minWidth', 1);

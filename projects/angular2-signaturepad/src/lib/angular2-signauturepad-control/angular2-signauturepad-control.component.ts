@@ -16,8 +16,8 @@ import {
 import {
   ControlContainer,
   ControlValueAccessor,
-  FormControl,
-  FormGroup,
+  UntypedFormControl,
+  UntypedFormGroup,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
 import * as SignaturePadNative from 'signature_pad';
@@ -63,7 +63,7 @@ export class SignaturePadControl
 
   onTouched!: () => void;
   onChange!: (value: InputType) => void;
-  control!: FormControl;
+  control!: UntypedFormControl;
 
   constructor(
     private elementRef: ElementRef,
@@ -116,9 +116,9 @@ export class SignaturePadControl
 
   ngOnInit(): void {
     if (this.parentFormContainer) {
-      this.control = (this.parentFormContainer.control as FormGroup).controls[
+      this.control = (this.parentFormContainer.control as UntypedFormGroup).controls[
         this.formControlName
-      ] as FormControl;
+      ] as UntypedFormControl;
     }
   }
 
