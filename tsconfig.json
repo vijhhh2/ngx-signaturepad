@@ -11,15 +11,19 @@
     "strict": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "es2020",
+    "target": "ES2022",
     "module": "es2020",
-    "lib": ["es2018", "dom"],
+    "lib": [
+      "es2018",
+      "dom"
+    ],
     "paths": {
       "angular2-signaturepad": [
         "dist/angular2-signaturepad/angular2-signaturepad",
         "dist/angular2-signaturepad"
       ]
-    }
+    },
+    "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
     "maxLineLength": 500
