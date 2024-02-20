@@ -3,12 +3,17 @@
 Angular 2 component for [szimek/signature_pad](https://www.npmjs.com/package/signature_pad).
 Fork of [wulfsolter/angular2-signaturepad](https://www.npmjs.com/package/angular2-signaturepad).
 
+# V1.1.2
+  ## Features:
+  - [x] Updated to angular 15
+  - [x] Updated signature_pad to latest
+
 # V1.1.0
   ## Features:
   - [x] Added Signature pad control
 # Install 
 
-`npm install angular2-signaturepad --save`
+`npm i @vijhhh2/ngx-signaturepad --save`
 
 ## Reference Implementation
 
@@ -29,7 +34,7 @@ Options are as per [szimek/signature_pad](https://www.npmjs.com/package/signatur
 
 // import into app module
 
-import { SignaturePadModule } from 'angular2-signaturepad';
+import { SignaturePadModule } from '@vijhhh2/angular2-signaturepad';
 
 ...
 
