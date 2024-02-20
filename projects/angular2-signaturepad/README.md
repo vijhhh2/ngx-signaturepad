@@ -3,9 +3,17 @@
 Angular 2 component for [szimek/signature_pad](https://www.npmjs.com/package/signature_pad).
 Fork of [wulfsolter/angular2-signaturepad](https://www.npmjs.com/package/angular2-signaturepad).
 
-# V1.1.2
+# V1.1.4
+  ## Features:
+  - [x] Updated to angular 17
+
+# V1.1.3
   ## Features:
   - [x] Updated to angular 15
+  
+# V1.1.2
+  ## Features:
+  - [x] Updated to angular 14
   - [x] Updated signature_pad to latest
 
 # V1.1.0
